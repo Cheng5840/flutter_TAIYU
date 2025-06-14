@@ -1,23 +1,67 @@
 import 'package:flutter/material.dart';
 
-class ChatRoomPage extends StatelessWidget {
+class ChatRoomPage extends StatefulWidget {
   final String groupName;
   const ChatRoomPage({super.key, required this.groupName});
+
+  @override
+  State<ChatRoomPage> createState() => _ChatRoomPageState();
+}
+
+class _ChatRoomPageState extends State<ChatRoomPage> {
+  final TextEditingController _messageController = TextEditingController();
+  List<Widget> _chatMessages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeChatMessages();
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  // 初始化聊天訊息
+  void _initializeChatMessages() {
+    _chatMessages = _buildInitialChatMessages();
+  }
+
+  // 發送訊息
+  void _sendMessage() {
+    String message = _messageController.text.trim();
+    print("嘗試發送訊息: '$message'"); // 調試用
+    if (message.isNotEmpty) {
+      setState(() {
+        _chatMessages.add(const SizedBox(height: 16));
+        _chatMessages.add(_buildMyMessage(message: message));
+      });
+      _messageController.clear();
+      print("訊息已發送，總共 ${_chatMessages.length} 個元素"); // 調試用
+    } else {
+      print("訊息為空，未發送"); // 調試用
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(groupName),
+        title: Text(widget.groupName),
         backgroundColor: const Color(0xFFFDF6EC),
       ),
       body: Column(
         children: [
           // 聊天訊息列表
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              children: _buildChatMessages(),
+              itemCount: _chatMessages.length,
+              itemBuilder: (context, index) {
+                return _chatMessages[index];
+              },
             ),
           ),
 
@@ -44,19 +88,25 @@ class ChatRoomPage extends StatelessWidget {
                       color: const Color(0xFFF5F5DC), // 淡黃色背景
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        hintText: "",
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: const InputDecoration(
+                        hintText: "輸入訊息...",
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (value) {
+                        print("onSubmitted 被觸發: '$value'"); // 調試用
+                        _sendMessage();
+                      },
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.keyboard_voice, color: Colors.white),
-                  onPressed: () {},
+                  icon: const Icon(Icons.send, color: Colors.white),
+                  onPressed: _sendMessage, // 點擊發送按鈕
                 ),
               ],
             ),
@@ -67,9 +117,9 @@ class ChatRoomPage extends StatelessWidget {
     );
   }
 
-  // 根據群組名稱返回不同的聊天內容
-  List<Widget> _buildChatMessages() {
-    switch (groupName) {
+  // 根據群組名稱返回不同的初始聊天內容
+  List<Widget> _buildInitialChatMessages() {
+    switch (widget.groupName) {
       case 'Jordan一家親(32)':
         return _buildJordanFamilyMessages();
       case '台北大咖們(103)':
@@ -189,7 +239,7 @@ class ChatRoomPage extends StatelessWidget {
       _buildOtherMessage(
         name: "系統訊息",
         avatarPath: "assets/system_avatar.png",
-        message: "歡迎來到 $groupName 群組！",
+        message: "歡迎來到 ${widget.groupName} 群組！",
       ),
       const SizedBox(height: 16),
       _buildMyMessage(
