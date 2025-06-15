@@ -135,19 +135,19 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           ...words.map((wordData) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // 左邊：中文詞
                 SizedBox(
                   width: 80, // 固定寬度給中文詞
                   child: Text(
                     wordData.word,
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ),
-                // 中間：圓圈與詞性
+                const SizedBox(width: 12),
+                // 詞性圓圈
                 Container(
                   width: 24,
                   height: 24,
@@ -160,24 +160,39 @@ class ProfilePage extends StatelessWidget {
                       wordData.partOfSpeech,
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Colors.white, // 圓圈內文字顏色
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                // 右邊：拼音（小字）與台羅
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      wordData.pinyin,
-                      style: const TextStyle(fontSize: 10, color: Colors.black54),
-                    ),
-                    Text(
-                      wordData.taiwanese,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                // 右邊：拼音和台語翻譯，採用兩列式排版
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 第一行：拼音（小字，灰色）
+                      Text(
+                        wordData.pinyin,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // 第二行：台語翻譯（正常大小）
+                      Text(
+                        wordData.taiwanese,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -186,7 +201,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
   void _showFriendListDialog(BuildContext context) {
     showDialog(
       context: context,
